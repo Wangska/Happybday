@@ -7,7 +7,9 @@
 body {
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  min-height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: "Segoe UI", Arial, sans-serif;
   background: radial-gradient(circle at top, #ffd6e8 0%, #ff9fc7 35%, #8f5de8 100%);
   color: white;
@@ -16,11 +18,29 @@ body {
 .scene {
   width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   padding: 25px;
+}
+
+.scene::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  background-image: linear-gradient(rgba(53, 16, 43, .42), rgba(53, 16, 43, .62)), var(--birthday-photo);
+  background-position: center;
+  background-size: cover;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.scene.opened::before {
+  opacity: 1;
 }
 
 .glow {
@@ -31,6 +51,7 @@ body {
   background: rgba(255, 255, 255, .18);
   filter: blur(70px);
   animation: pulse 3s infinite alternate;
+  z-index: 1;
 }
 
 .card {
@@ -42,6 +63,7 @@ body {
   justify-content: center;
   flex-direction: column;
   text-align: center;
+  z-index: 2;
 }
 
 .gift-wrap {
@@ -184,8 +206,8 @@ body {
 
 .portrait {
   display: block;
-  width: 104px;
-  height: 104px;
+  width: 176px;
+  height: 176px;
   object-fit: cover;
   object-position: center 38%;
   margin: 0 auto 12px;
@@ -224,8 +246,41 @@ body {
 
 .close-note {
   margin-top: 18px;
-  font-size: 13px;
+  font-size: 20px;
   opacity: .75;
+}
+
+.audio-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .16);
+  color: white;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .2s ease;
+}
+
+.audio-button:hover {
+  background: rgba(255, 255, 255, .28);
+  transform: translateY(-2px);
+}
+
+.audio-button:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 3px;
+}
+
+.audio-status {
+  margin-top: 10px;
+  font-size: 14px !important;
 }
 
 .confetti {
@@ -280,13 +335,19 @@ body {
   .gift-wrap { transform: scale(.85); }
   .message { padding-block: 12px; }
   .cake { font-size: 60px; }
-  .portrait { width: 82px; height: 82px; margin-bottom: 8px; }
+  .portrait { width: 140px; height: 140px; margin-bottom: 8px; }
 }
 
 @media (max-width: 480px) {
-  .scene { padding: 14px; }
+  .scene { padding: 14px 10px; }
   .message { width: 94vw; padding-inline: 14px; }
   .message p { line-height: 1.45; }
+  .scene.opened::before {
+    background-position: center, center;
+    background-size: 100% 100%, contain;
+    background-repeat: no-repeat;
+    background-color: #061b1e;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

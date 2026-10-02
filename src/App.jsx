@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
-import portrait from '../img.png';
+import { useEffect, useRef, useState } from 'react';
+import audioMessage from '../audio.m4a';
+import background from '../bg.png';
+import portrait from '../img.jpg';
 
 const confettiPieces = ['🎉', '✨', '💖', '⭐', '🎊', '💫'];
 
@@ -39,6 +41,9 @@ export default function App() {
   const [opened, setOpened] = useState(false);
   const [confetti, setConfetti] = useState([]);
   const [sparkles, setSparkles] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioStatus, setAudioStatus] = useState('');
+  const audioRef = useRef(null);
 
   useEffect(() => {
     if (!opened) return undefined;
@@ -58,8 +63,30 @@ export default function App() {
     setOpened(true);
   }
 
+  async function toggleAudio() {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      setAudioStatus('');
+      try {
+        await audio.play();
+        setIsPlaying(true);
+      } catch {
+        setIsPlaying(false);
+        setAudioStatus('Could not play audio.m4a. Check that the recording is valid.');
+      }
+    } else {
+      audio.pause();
+      setIsPlaying(false);
+    }
+  }
+
   return (
-    <main className="scene">
+    <main
+      className={`scene${opened ? ' opened' : ''}`}
+      style={{ '--birthday-photo': `url("${background}")` }}
+    >
       <div className="glow" aria-hidden="true" />
       <section className={`card${opened ? ' opened' : ''}`} aria-label="Birthday surprise">
         <button
@@ -76,7 +103,7 @@ export default function App() {
         </button>
 
         <p className="hint" aria-live="polite">
-          {opened ? '💖 Your surprise is here!' : '🎁 Click the gift to open your surprise!'}
+          {opened ? '' : '🎁 Click the gift to open your surprise!'}
         </p>
 
         <div className="message" aria-hidden={!opened}>
@@ -85,11 +112,24 @@ export default function App() {
           <h1>Happy Birthday!</h1>
           <h2>🥳 Grasyaaa 🥳</h2>
           <p>
-            May your birthday be filled with laughter, happiness,
-            wonderful memories, and all the things that make you smile.
-            Here&apos;s to another amazing year ahead! ✨
+            Wishing you a wonderful birthday filled with happiness, good health, and many blessings. May your special day be as amazing as you are!
           </p>
-          <div className="close-note">Made with ❤️ just for you</div>
+          <div className="close-note">Happy Birthday from the IT Team! 🎉</div>
+          <audio
+            ref={audioRef}
+            src={audioMessage}
+            preload="none"
+            onEnded={() => setIsPlaying(false)}
+            onError={() => {
+              setIsPlaying(false);
+              setAudioStatus('Could not play audio.m4a. Check that the recording is valid.');
+            }}
+          />
+          <button className="audio-button" type="button" onClick={toggleAudio}>
+            <span aria-hidden="true">{isPlaying ? '❚❚' : '▶'}</span>
+            {isPlaying ? 'Pause voice message' : 'Play voice message'}
+          </button>
+          {audioStatus && <p className="audio-status" role="status">{audioStatus}</p>}
         </div>
       </section>
 
